@@ -1,0 +1,37 @@
+version: '3.3'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: postgress
+    environment:
+      POSTGRES_DB: blossom
+      POSTGRES_USER: blossom_user
+      POSTGRES_PASSWORD: blossom_pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U blossom_user -d blossom"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  postgres_data:
+  redis_data:
